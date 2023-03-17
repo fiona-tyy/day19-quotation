@@ -10,6 +10,8 @@ import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisClientConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
@@ -31,7 +33,7 @@ public class RedisConfig {
     // specify a name for the bean for subsequent autowiring
     @Bean ("quote") 
     @Scope("singleton")
-    public RedisTemplate<String, String> redisTemplate(){
+    public RedisTemplate<String, Object> redisTemplate(){
         final RedisStandaloneConfiguration config = new RedisStandaloneConfiguration();
         config.setHostName(redisHost);
         config.setPort(redisPort.get());  // need .get because it is an optional(null safety)
@@ -46,10 +48,15 @@ public class RedisConfig {
         final JedisConnectionFactory jedisFac = new JedisConnectionFactory(config, jedisClient);
         jedisFac.afterPropertiesSet();
 
-        RedisTemplate<String, String> r = new RedisTemplate<String, String>();
+        RedisTemplate<String, Object> r = new RedisTemplate<String, Object>();
         r.setConnectionFactory(jedisFac);
         r.setKeySerializer(new StringRedisSerializer());
         r.setValueSerializer(new StringRedisSerializer());
+
+        RedisSerializer<Object> objSerializer = new JdkSerializationRedisSerializer(getClass().getClassLoader());
+        r.setHashKeySerializer(new StringRedisSerializer());
+        r.setHashValueSerializer(objSerializer);
+
         
         
         System.out.println("redisHost > " + redisHost);

@@ -16,6 +16,23 @@ public class Item implements Serializable{
     private String username;
     private String id;
     private String dt;
+
+    public Item() {
+    }
+
+    public Item(String name, float price, String username) {
+        this.name = name;
+        this.price = price;
+        this.username = username;
+    }
+
+    public Item(String name, float price, String username, String id, String dt) {
+        this.name = name;
+        this.price = price;
+        this.username = username;
+        this.id = id;
+        this.dt = dt;
+    }
     
     public String getName() {
         return name;
